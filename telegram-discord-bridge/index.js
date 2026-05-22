@@ -54,6 +54,14 @@ async function bootstrap() {
             });
         });
 
+        app.get('/', (req, res) => {
+            res.status(200).json({
+                bot: 'Telegram-Discord Bridge',
+                status: 'running',
+                healthCheck: '/health'
+            });
+        });
+
         app.listen(port, () => {
             logger.info(`Health check server running on port ${port}`);
         });
