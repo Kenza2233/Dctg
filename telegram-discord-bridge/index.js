@@ -7,6 +7,7 @@ import { DiscordBotService } from './discord/bot.js';
 import { ImageSender } from './discord/imageSender.js';
 import { VoiceManager } from './discord/voiceManager.js';
 import { downloadImage } from './utils/imageDownloader.js';
+import express from 'express';
 
 /**
  * Retries an async function with exponential backoff.
@@ -36,8 +37,26 @@ async function bootstrap() {
         const discordClient = discordService.getClient();
 
         const imageSender = new ImageSender(discordClient, config.discordChannelId);
-        const voiceManager = new VoiceManager(discordClient, config.discordVoiceChannelId, logger);
+        let voiceManager = null;
+        voiceManager = new VoiceManager(discordClient, config.discordVoiceChannelId, logger);
         await voiceManager.start();
+
+        // Health check server (for UptimeRobot to prevent Render Free sleep)
+        const app = express();
+        const port = config.port || 3000;
+
+        app.get('/health', (req, res) => {
+            res.status(200).json({
+                status: 'ok',
+                uptime: Math.floor(process.uptime()),
+                voiceConnected: voiceManager ? voiceManager.isConnected : false,
+                timestamp: new Date().toISOString()
+            });
+        });
+
+        app.listen(port, () => {
+            logger.info(`Health check server running on port ${port}`);
+        });
 
         // Initialize Telegram
         const telegrafBot = new Telegraf(config.telegramBotToken);
