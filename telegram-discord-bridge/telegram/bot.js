@@ -26,17 +26,8 @@ export class TelegramBotService {
         }
     }
 
-    async stop() {
-        if (this.useWebhook) {
-            try {
-                await this.bot.telegram.deleteWebhook();
-                logger.info('Telegram webhook deleted');
-            } catch (error) {
-                logger.error(`Failed to delete Telegram webhook: ${error.message}`);
-            }
-        } else {
-            this.bot.stop();
-            logger.info('Telegram bot stopped');
-        }
+    stop() {
+        this.bot.stop();
+        logger.info('Telegram bot stopped');
     }
 }

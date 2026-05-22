@@ -104,17 +104,6 @@ async function bootstrap() {
 
         await telegramService.start();
 
-        // Graceful shutdown
-        const shutdown = async (signal) => {
-            logger.info(`${signal} received. Shutting down gracefully...`);
-            await telegramService.stop();
-            discordService.stop();
-            process.exit(0);
-        };
-
-        process.on('SIGINT', () => shutdown('SIGINT'));
-        process.on('SIGTERM', () => shutdown('SIGTERM'));
-
     } catch (error) {
         logger.error(`Fatal error during bootstrap: ${error.message}`);
         process.exit(1);
