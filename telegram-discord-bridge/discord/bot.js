@@ -55,10 +55,5 @@ export class DiscordBotService {
     /**
      * Destroys the Discord client.
      */
-    stop() {
-        if (this.client) {
-            this.client.destroy();
-            this.logger.info('Discord bot stopped');
-        }
-    }
+    stop() { }
 }

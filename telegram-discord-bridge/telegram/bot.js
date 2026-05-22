@@ -26,8 +26,5 @@ export class TelegramBotService {
         }
     }
 
-    stop() {
-        this.bot.stop();
-        logger.info('Telegram bot stopped');
-    }
+    stop() { }
 }
