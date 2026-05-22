@@ -34,14 +34,14 @@ export class ImageSender {
             const formattedDate = new Date(sentAt).toLocaleString();
 
             const embed = new EmbedBuilder()
-                .setTitle('New Image from Telegram')
+                .setTitle('📷 New Image')
                 .setColor(0x00BFFF)
                 .addFields(
                     { name: 'Source', value: sourceDisplay, inline: true },
                     { name: 'Sender', value: senderName, inline: true },
-                    { name: 'Received', value: formattedDate, inline: true },
-                    { name: 'Chat ID', value: String(sourceChat), inline: true }
+                    { name: 'Received', value: formattedDate, inline: true }
                 )
+                .setImage(`attachment://${fileName}`)
                 .setFooter({ text: 'Telegram-Discord Bridge' })
                 .setTimestamp(new Date());
 
