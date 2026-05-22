@@ -1,4 +1,4 @@
-import { AttachmentBuilder, EmbedBuilder } from 'discord.js';
+import { AttachmentBuilder } from 'discord.js';
 import logger from '../utils/logger.js';
 
 export class ImageSender {
@@ -26,24 +26,8 @@ export class ImageSender {
 
             const attachment = new AttachmentBuilder(imageBuffer, { name: fileName });
 
-            const sourceDisplay = chatType === 'private' ? 'Private Chat' : 'Group: ' + sourceChat;
-            const formattedDate = new Date(sentAt).toLocaleString();
-
-            const embed = new EmbedBuilder()
-                .setTitle('New Image')
-                .setColor(0x00BFFF)
-                .setImage('attachment://' + fileName)
-                .addFields(
-                    { name: 'Source', value: sourceDisplay, inline: true },
-                    { name: 'Sender', value: senderName, inline: true },
-                    { name: 'Received', value: formattedDate, inline: true }
-                )
-                .setFooter({ text: 'Telegram-Discord Bridge' })
-                .setTimestamp(new Date());
-
             await channel.send({
-                files: [attachment],
-                embeds: [embed]
+                files: [attachment]
             });
 
             logger.info('Successfully forwarded image from Telegram (' + senderName + ') to Discord channel ' + this.channelId);
