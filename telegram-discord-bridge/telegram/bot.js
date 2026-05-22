@@ -1,33 +1,38 @@
 import logger from '../utils/logger.js';
 
 export class TelegramBotService {
-    /**
-     * @param {import('telegraf').Telegraf} bot
-     * @param {object} config
-     */
     constructor(bot, config) {
         this.bot = bot;
         this.config = config;
+        this.useWebhook = !!config.telegramWebhookUrl;
     }
 
-    /**
-     * Starts the Telegram bot.
-     */
     async start() {
         try {
-            await this.bot.launch();
-            logger.info('Telegram bot is running');
+            if (this.useWebhook && this.config.telegramWebhookUrl) {
+                await this.bot.telegram.setWebhook(this.config.telegramWebhookUrl);
+                logger.info(`Telegram bot running in webhook mode: ${this.config.telegramWebhookUrl}`);
+            } else {
+                await this.bot.launch();
+                logger.info('Telegram bot is running in polling mode');
+            }
         } catch (error) {
             logger.error(`Failed to launch Telegram bot: ${error.message}`);
             throw error;
         }
     }
 
-    /**
-     * Stops the Telegram bot.
-     */
-    stop() {
-        this.bot.stop();
-        logger.info('Telegram bot stopped');
+    async stop() {
+        if (this.useWebhook) {
+            try {
+                await this.bot.telegram.deleteWebhook();
+                logger.info('Telegram webhook deleted');
+            } catch (error) {
+                logger.error(`Failed to delete Telegram webhook: ${error.message}`);
+            }
+        } else {
+            this.bot.stop();
+            logger.info('Telegram bot stopped');
+        }
     }
 }

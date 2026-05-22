@@ -7,6 +7,7 @@ const config = {
     discordBotToken: process.env.DISCORD_BOT_TOKEN,
     discordChannelId: process.env.DISCORD_CHANNEL_ID,
     discordVoiceChannelId: process.env.DISCORD_VOICE_CHANNEL_ID,
+    telegramWebhookUrl: process.env.TELEGRAM_WEBHOOK_URL || null,
     port: process.env.PORT || 3000,
     allowedAllChats: false,
     allowedChatIds: []

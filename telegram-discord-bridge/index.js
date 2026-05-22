@@ -41,6 +41,9 @@ async function bootstrap() {
         voiceManager = new VoiceManager(discordClient, config.discordVoiceChannelId, logger);
         await voiceManager.start();
 
+        // Initialize Telegram Bot instance early so it can be used for webhooks
+        const telegrafBot = new Telegraf(config.telegramBotToken);
+
         // Health check server (for UptimeRobot to prevent Render Free sleep)
         const app = express();
         const port = config.port || 3000;
@@ -62,12 +65,16 @@ async function bootstrap() {
             });
         });
 
+        if (config.telegramWebhookUrl) {
+            app.use(telegrafBot.webhookCallback('/webhook/telegram'));
+            logger.info('Webhook route registered at /webhook/telegram');
+        }
+
         app.listen(port, () => {
             logger.info(`Health check server running on port ${port}`);
         });
 
-        // Initialize Telegram
-        const telegrafBot = new Telegraf(config.telegramBotToken);
+        // Initialize Telegram Service
         const telegramService = new TelegramBotService(telegrafBot, config);
 
         registerTelegramHandlers(telegrafBot, async (chatId, chatType, senderName, imageData) => {
@@ -100,7 +107,7 @@ async function bootstrap() {
         // Graceful shutdown
         const shutdown = async (signal) => {
             logger.info(`${signal} received. Shutting down gracefully...`);
-            telegramService.stop();
+            await telegramService.stop();
             discordService.stop();
             process.exit(0);
         };
